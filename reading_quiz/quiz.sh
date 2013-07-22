@@ -58,7 +58,7 @@ split_lines() {
 # $1 is the level. Returns non-zero on invalid levels.
 ask_question() {
     check_level "$1" || return 1
-    SOURCE=$(load_source_line "$1")
+    local SOURCE=$(load_source_line "$1")
     split_lines "${SOURCE//|/$'\n'}"
     printf '%s\n%s\n%s\n%s\n' "$KANJI" "$READINGS" "$MEANING" "$1" > "$QUESTION_FILE"
     printf_ 'Please read: %s' "$KANJI"
@@ -108,13 +108,13 @@ check_if_answer() {
         echo_ 'Please specify a level.'
         return
     fi
-    PROPOSED="${1// /}"
+    local PROPOSED="${1// /}"
     split_lines "$(cat "$QUESTION_FILE")"
-    IFS=','
+    local IFS=','
     for R in $READINGS; do
         if [[ $R = $PROPOSED ]]; then
             ### The argument order is $USER $READINGS $MEANING
-            printf_ '%s: Correct! (%s: %s)' "$USER" "$READINGS" "$MEANING"
+            printf_ '%s: Correct!' "$USER"
             record_answer 1
             # Ignore additional answers for a few seconds.
             set_timer 2
@@ -165,14 +165,15 @@ if printf '%s\n' "$QUERY" | grep -q '^\(next\|skip\) *$'; then
         exit 0
     fi
     split_lines "$(cat "$QUESTION_FILE")"
-    printf_ 'Skipping %s [%s]...' "$KANJI" "$READINGS"
+    printf_ 'Skipping %s (%s: %s)' "$KANJI" "$READINGS" "$MEANING"
     set_timer 2
     exit 0
 fi
 
 # Handle answers.
-if echo "$QUERY" | grep -v -q '^[][a-zA-Z0-9 ./-_`]\+$'; then
-    # $QUERY contains non-latin characters, so assume it's an answer.
+if echo "$QUERY" | LC_ALL=C grep -vq '^[a-zA-Z0-9 -]\+$'; then
+    # $QUERY contains non-latin characters or characters unsafe for a
+    # filename, so assume it's an answer.
     check_if_answer "$QUERY"
     exit 0
 fi
