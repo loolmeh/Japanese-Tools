@@ -65,7 +65,9 @@ scripts = [('cdecl', '../cdecl/c.sh'),
 	   ('jmdict', '../jmdict/jm.sh'),
 	   ('define', '../gd/gd.sh'),
 	   ('wiki', '../wiki/wiki.sh'),
-	   ('jwiki', '../wiki/jwiki.sh')
+	   ('jwiki', '../wiki/jwiki.sh'),
+           ('quiz', '../quiz/quiz.sh'),
+           ('versus', '../quiz/versus.sh')
            ]
 
 def run_script(path, argument, irc_source_target, ignore_errors=False):
